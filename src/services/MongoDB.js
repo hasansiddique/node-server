@@ -1,12 +1,10 @@
 import Logger from 'loglevel';
 import Dateformat from 'dateformat';
-import mongdb from 'mongodb';
+import mongoose from 'mongoose';
 
 import config from '../config';
 import { DATE_FORMAT } from '../common/constants';
 import ConnectionState from '../common/ConnectionState';
-
-const { MongoClient } = mongdb;
 
 class MongoDB {
   constructor() {
@@ -30,7 +28,7 @@ class MongoDB {
       database,
     } = mongodbConfig;
 
-    const uri = `mongodb://${clusterUrl}:${clusterPort}`;
+    const uri = `mongodb://${clusterUrl}:${clusterPort}/${database}`;
     const connectionAuth = {
       useNewUrlParser: true,
       useUnifiedTopology: true,
@@ -42,14 +40,11 @@ class MongoDB {
       }, */
     };
 
-    this.client = new MongoClient(uri, connectionAuth);
-
     try {
-      this.pool = await this.client.connect();
+      this.pool = await mongoose.connect(uri, connectionAuth);
 
       if (this.pool) {
         this.state = ConnectionState.READY;
-        this.db = this.client.db(database);
         Logger.info(`time="${Dateformat(Date.now(), DATE_FORMAT, true)}" level=INFO message="Connected to MongoDB database."`);
       } else {
         this.state = ConnectionState.FAILED;
@@ -65,7 +60,7 @@ class MongoDB {
 
   disconnect() {
     if (this.pool) {
-      this.client.close((err) => {
+      this.pool.on('error', (err) => {
         if (err) {
           Logger.error(`time="${Dateformat(Date.now(), DATE_FORMAT, true)}" level=ERROR message="Disconnect  MongoDB connection failed. ${err}"`);
         }

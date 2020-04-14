@@ -8,11 +8,22 @@ const router = Router({ prefix: '/user-preferences' });
 /* TODO @(hasiddiq): added for testing */
 router.get('/', async (ctx) => {
   try {
-    const collection = await mongodb.db.collection('users');
-    const userPreferences = { username: ctx.query.username, name: 'Hasan Siddique', email: 'hasiddiq@cisco.com' };
-    collection.insertOne(userPreferences);
+    const UserSchema = mongodb.pool.Schema({
+      username: String,
+      name: String,
+      email: String,
+    });
+
+    const User = await mongodb.pool.model('User', UserSchema, 'users');
+    const newUser = new User({ username: ctx.query.username, name: 'Hasan Siddique', email: 'hasiddiq@cisco.com' });
+
+    await newUser.save((err, user) => {
+      if (err) return err;
+      return user;
+    });
+
     ctx.body = {
-      user_preferences: userPreferences,
+      user_preferences: newUser,
     };
   } catch (error) {
     // handleMongoError(error);
