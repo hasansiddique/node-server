@@ -28,7 +28,13 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+}, {id: true});
+
+// Ensure virtual fields are serialised.
+userSchema.set('toJSON', {
+  virtuals: true,
 });
+
 // eslint-disable-next-line func-names
 userSchema.methods.getJwtToken = function () {
   // eslint-disable-next-line no-underscore-dangle,no-return-await
