@@ -20,4 +20,8 @@ export default {
     clusterUrl: process.env.MONGODB_CLUSTER_URL || 'localhost',
     database: process.env.MONGODB_DATABASE || 'wc_management_portal',
   },
+  jwtConfig: {
+    JWT_SECRET: 'mySecret1Token234568',
+    JWT_EXPIRE: '7h',
+  },
 };

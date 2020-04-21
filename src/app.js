@@ -8,11 +8,9 @@ import BodyParser from 'koa-bodyparser';
 
 // Route imports
 import index from './routes';
-import log from './routes/v1/log';
-import health from './routes/v1/health';
 import mongodb from './services/MongoDB';
 import { DATE_FORMAT } from './common/constants';
-import userPreferencesRoutes from './routes/v1/userPreferences';
+import user from './routes/v1/user/user.routes';
 
 import config from './config';
 
@@ -28,9 +26,7 @@ const router = Router();
 const v1router = Router();
 
 // Declare v1 routes
-v1router.use(log.routes());
-v1router.use(health.routes());
-v1router.use(userPreferencesRoutes.routes());
+v1router.use(user.routes());
 
 // Declare root routes
 router.use(index.routes());
@@ -45,6 +41,7 @@ koa.use(BodyParser({
 
 // Use routes
 koa.use(router.routes());
+
 
 // Listen to port
 const port = parseInt(config.serverPort, 10);
